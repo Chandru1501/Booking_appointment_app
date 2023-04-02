@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Appointment</title>
+</head>
+<body>
+    <h1>BOOKING APPOINTMENT APP</h1>
+
+        <h2>Enter Details</h2>
+        <label for="username">User Name</label><br>
+        <input type="text" name="username" id="name"><br>
+        <label for="phonenumber">Phone Number</label><br>
+        <input type="number" name="phonenumber" id="phone"><br>
+        <label for="email">Email</label><br>
+        <input type="email" name="email" id="email"><br>
+        <button type="submit" class="btn">Submit</button>
+
+        <ul>
+            
+        </ul>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        let btn = document.querySelector('.btn');
+        var Name =document.querySelector('#name');
+        var Phone = document.querySelector('#phone');
+        var Email = document.querySelector('#email');
+        var ul = document.querySelector('ul');
+
+        btn.addEventListener('click',postUser)
+        btn.addEventListener('click',()=>{
+            setTimeout(()=>{
+                location.reload();
+            },600);
+        })
+        window.addEventListener('DOMContentLoaded',getUsers);
+        
+     async function postUser (){
+        try{
+        let response =  await axios.post('http://localhost:1000/admin/adduser',{
+                id: null,
+                name : Name.value,
+                phone : Phone.value,
+                email : Email.value
+            })
+        }
+        catch(err){
+            console.log(err);
+        }
+    }
+    
+    async function getUsers(){
+            try{
+                const data = await axios.get('http://localhost:1000/admin/getusers')
+                if(data.data.length>0){
+                    data.data.forEach(userdata => {
+                        
+                        var li = document.createElement('li');
+                        li.append("Name: "+userdata.name+" "+"Phonenumber: "+userdata.phonenumber+" "+"Email: "+userdata.email);
+                        var editbtn = document.createElement('button');
+                        editbtn.className = "btn";
+                        editbtn.appendChild(document.createTextNode('Edit'));
+                        var deletebtn = document.createElement('button');
+                        deletebtn.className ="btn";
+                        deletebtn.appendChild(document.createTextNode('Delete'));
+                        li.appendChild(editbtn);
+                        li.appendChild(deletebtn);
+                        ul.appendChild(li);
+                        console.log("user data retrived")
+
+                        deletebtn.onclick = ()=>{
+                            ul.removeChild(li);
+                            deleteuser(userdata.id);
+                        }
+                    })
+                }
+
+            }
+            catch(err){
+                console.log(err);
+            }
+        }
+
+
+       async function deleteuser(id){
+            console.log(id)
+            try{
+            let response = await axios.post(`http://localhost:1000/admin/delete-user/${id}`)
+            console.log(`${id} has been deleted`);
+            }
+            catch(err){
+                console.log(err)
+            }
+        }
+    </script>
+</body>
+</html>
